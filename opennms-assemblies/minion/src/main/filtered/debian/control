@@ -1,0 +1,15 @@
+Source: opennms-minion
+Maintainer: Benjamin Reed <ranger@opennms.org>
+Section: contrib/net
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9), oracle-java8-installer | openjdk-8-jdk | java8-jdk, rsync
+
+Package: opennms-minion
+Architecture: all
+Depends: oracle-java8-installer | openjdk-8-jre | java8-runtime | java8-runtime-headless
+Description: distributed OpenNMS monitoring client
+ OpenNMS Minion is a container infrastructure for distributed, scalable network
+ management and monitoring.
+ .
+ http://www.opennms.org/wiki/Minion

@@ -4,7 +4,7 @@
 # description: Starts and stops the OpenNMS Minion distributed client
 # processname: java
 #
-# NOTE: If you edit this file, also edit debian/opennms-minion.minion.init!
+# NOTE: If you edit this file, also edit etc/minion.init!
 #
 ### BEGIN INIT INFO
 # Provides:          minion
@@ -24,7 +24,7 @@ NAME="minion"
 DESC="Minion"
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 MINION_HOME="/opt/minion"
-SYSCONFDIR="${MINION_HOME}/etc"
+SYSCONFDIR="/etc/default"
 RUNAS=root
 STOP_RETRIES=10
 STOP_WAIT=5
@@ -50,9 +50,9 @@ if [ -r "${MINION_HOME}/minion.conf" ]; then
 	. "${MINION_HOME}/minion.conf"
 fi
 
-if [ -r "${MINION_HOME}/etc/minion.conf" ]; then
+if [ -r "/etc/minion/minion.conf" ]; then
 	# shellcheck disable=SC1090,SC1091
-	. "${MINION_HOME}/etc/minion.conf"
+	. "/etc/minion/minion.conf"
 fi
 
 validate_icmp() {
