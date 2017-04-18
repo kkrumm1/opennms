@@ -31,6 +31,7 @@ package org.opennms.web.rest.v2;
 import java.util.Collection;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.core.UriInfo;
 
 import org.opennms.core.config.api.JaxbListWrapper;
 import org.opennms.core.criteria.Alias.JoinType;
@@ -66,7 +67,7 @@ public class OutageRestService extends AbstractDaoRestService<OnmsOutage,Integer
 	}
 
 	@Override
-	protected CriteriaBuilder getCriteriaBuilder() {
+	protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
 		final CriteriaBuilder builder = new CriteriaBuilder(OnmsOutage.class);
 		builder.alias("monitoredService", "monitoredService", JoinType.LEFT_JOIN);
 		builder.alias("monitoredService.ipInterface", "ipInterface", JoinType.LEFT_JOIN);

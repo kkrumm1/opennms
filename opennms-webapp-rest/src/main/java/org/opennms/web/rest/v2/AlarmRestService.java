@@ -34,46 +34,53 @@ import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 
 import org.opennms.core.config.api.JaxbListWrapper;
+import org.opennms.core.criteria.Alias.JoinType;
+import org.opennms.core.criteria.Fetch.FetchType;
 import org.opennms.core.criteria.CriteriaBuilder;
-import org.opennms.netmgt.dao.api.ApplicationDao;
-import org.opennms.netmgt.model.OnmsApplication;
-import org.opennms.web.rest.v1.support.OnmsApplicationList;
+import org.opennms.netmgt.dao.api.AlarmDao;
+import org.opennms.netmgt.model.OnmsAlarm;
+import org.opennms.netmgt.model.OnmsAlarmCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Basic Web Service using REST for {@link OnmsApplication} entity
+ * Basic Web Service using REST for {@link OnmsAlarm} entity.
  *
- * @author Seth
+ * @author <a href="agalue@opennms.org">Alejandro Galue</a>
  */
 @Component
-@Path("applications")
+@Path("events")
 @Transactional
-public class ApplicationRestService extends AbstractDaoRestService<OnmsApplication,Integer> {
+public class AlarmRestService extends AbstractDaoRestService<OnmsAlarm,Integer> {
 
-	@Autowired
-	private ApplicationDao m_dao;
+    @Autowired
+    private AlarmDao m_dao;
 
-	protected ApplicationDao getDao() {
-		return m_dao;
-	}
+    @Override
+    protected AlarmDao getDao() {
+        return m_dao;
+    }
 
-	protected Class<OnmsApplication> getDaoClass() {
-		return OnmsApplication.class;
-	}
+    @Override
+    protected Class<OnmsAlarm> getDaoClass() {
+        return OnmsAlarm.class;
+    }
 
-	protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
-		final CriteriaBuilder builder = new CriteriaBuilder(OnmsApplication.class);
+    @Override
+    protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
+        final CriteriaBuilder builder = new CriteriaBuilder(getDaoClass());
+        builder.fetch("firstEvent", FetchType.EAGER);
+        builder.fetch("lastEvent", FetchType.EAGER);
+        builder.alias("node", "node", JoinType.LEFT_JOIN);
+        builder.alias("node.snmpInterfaces", "snmpInterface", JoinType.LEFT_JOIN);
+        builder.alias("node.ipInterfaces", "ipInterface", JoinType.LEFT_JOIN);
+        return builder;
+    }
 
-		// Order by application name by default
-		builder.orderBy("name").asc();
+    @Override
+    protected JaxbListWrapper<OnmsAlarm> createListWrapper(Collection<OnmsAlarm> list) {
+        return new OnmsAlarmCollection(list);
+    }
 
-		return builder;
-	}
-
-	@Override
-	protected JaxbListWrapper<OnmsApplication> createListWrapper(Collection<OnmsApplication> list) {
-		return new OnmsApplicationList(list);
-	}
 }

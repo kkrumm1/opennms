@@ -28,52 +28,45 @@
 
 package org.opennms.web.rest.v2;
 
-import java.util.Collection;
+import java.io.Serializable;
 
-import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
 
-import org.opennms.core.config.api.JaxbListWrapper;
 import org.opennms.core.criteria.CriteriaBuilder;
-import org.opennms.netmgt.dao.api.ApplicationDao;
-import org.opennms.netmgt.model.OnmsApplication;
-import org.opennms.web.rest.v1.support.OnmsApplicationList;
+import org.opennms.netmgt.dao.api.NodeDao;
+import org.opennms.netmgt.model.OnmsNode;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Basic Web Service using REST for {@link OnmsApplication} entity
+ * Abstract Web Service using REST for entities that depend on OnmsNode.
  *
- * @author Seth
+ * @author <a href="agalue@opennms.org">Alejandro Galue</a>
  */
-@Component
-@Path("applications")
-@Transactional
-public class ApplicationRestService extends AbstractDaoRestService<OnmsApplication,Integer> {
+public abstract class AbstractNodeDependentRestService<T,K extends Serializable> extends AbstractDaoRestService<T,K> {
 
-	@Autowired
-	private ApplicationDao m_dao;
+    @Autowired
+    private NodeDao m_nodeDao;
 
-	protected ApplicationDao getDao() {
-		return m_dao;
-	}
+    protected void updateCriteria(final UriInfo uriInfo, final CriteriaBuilder builder) {
+        builder.alias("node", "node");
+        final String nodeCriteria = getNodeCriteria(uriInfo);
+        if (nodeCriteria.contains(":")) {
+            String[] parts = nodeCriteria.split(":");
+            builder.eq("node.foreignSource", parts[0]);
+            builder.eq("node.foreignId", parts[1]);
+        } else {
+            builder.eq("node.id", Integer.parseInt(nodeCriteria));
+        }
+    }
 
-	protected Class<OnmsApplication> getDaoClass() {
-		return OnmsApplication.class;
-	}
+    protected OnmsNode getNode(final UriInfo uriInfo) {
+        final String lookupCriteria = getNodeCriteria(uriInfo);
+        return m_nodeDao.get(lookupCriteria);
+    }
 
-	protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
-		final CriteriaBuilder builder = new CriteriaBuilder(OnmsApplication.class);
+    private String getNodeCriteria(final UriInfo uriInfo) {
+        return uriInfo.getPathSegments(true).get(1).getPath();
+    }
 
-		// Order by application name by default
-		builder.orderBy("name").asc();
-
-		return builder;
-	}
-
-	@Override
-	protected JaxbListWrapper<OnmsApplication> createListWrapper(Collection<OnmsApplication> list) {
-		return new OnmsApplicationList(list);
-	}
 }
