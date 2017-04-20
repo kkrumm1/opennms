@@ -45,35 +45,40 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Basic Web Service using REST for {@link OnmsApplication} entity
  *
- * @author Seth
+ * @author <a href="seth@opennms.org">Seth Leger</a>
  */
 @Component
 @Path("applications")
 @Transactional
-public class ApplicationRestService extends AbstractDaoRestService<OnmsApplication,Integer> {
+public class ApplicationRestService extends AbstractDaoRestService<OnmsApplication,Integer,Integer> {
 
-	@Autowired
-	private ApplicationDao m_dao;
+    @Autowired
+    private ApplicationDao m_dao;
 
-	protected ApplicationDao getDao() {
-		return m_dao;
-	}
+    protected ApplicationDao getDao() {
+        return m_dao;
+    }
 
-	protected Class<OnmsApplication> getDaoClass() {
-		return OnmsApplication.class;
-	}
+    protected Class<OnmsApplication> getDaoClass() {
+        return OnmsApplication.class;
+    }
 
-	protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
-		final CriteriaBuilder builder = new CriteriaBuilder(OnmsApplication.class);
+    protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
+        final CriteriaBuilder builder = new CriteriaBuilder(OnmsApplication.class);
 
-		// Order by application name by default
-		builder.orderBy("name").asc();
+        // Order by application name by default
+        builder.orderBy("name").asc();
 
-		return builder;
-	}
+        return builder;
+    }
 
-	@Override
-	protected JaxbListWrapper<OnmsApplication> createListWrapper(Collection<OnmsApplication> list) {
-		return new OnmsApplicationList(list);
-	}
+    @Override
+    protected JaxbListWrapper<OnmsApplication> createListWrapper(Collection<OnmsApplication> list) {
+        return new OnmsApplicationList(list);
+    }
+
+    @Override
+    protected OnmsApplication doGet(UriInfo uriInfo, Integer id) {
+        return getDao().get(id);
+    }
 }

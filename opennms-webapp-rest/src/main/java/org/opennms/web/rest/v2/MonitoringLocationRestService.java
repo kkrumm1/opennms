@@ -45,35 +45,40 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Basic Web Service using REST for {@link OnmsMonitoringLocation} entity
  *
- * @author Seth
+ * @author <a href="seth@opennms.org">Seth Leger</a>
  */
 @Component
 @Path("monitoringLocations")
 @Transactional
-public class MonitoringLocationRestService extends AbstractDaoRestService<OnmsMonitoringLocation,String> {
+public class MonitoringLocationRestService extends AbstractDaoRestService<OnmsMonitoringLocation,String,String> {
 
-	@Autowired
-	private MonitoringLocationDao m_dao;
+    @Autowired
+    private MonitoringLocationDao m_dao;
 
-	protected MonitoringLocationDao getDao() {
-		return m_dao;
-	}
+    protected MonitoringLocationDao getDao() {
+        return m_dao;
+    }
 
-	protected Class<OnmsMonitoringLocation> getDaoClass() {
-		return OnmsMonitoringLocation.class;
-	}
+    protected Class<OnmsMonitoringLocation> getDaoClass() {
+        return OnmsMonitoringLocation.class;
+    }
 
-	protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
-		final CriteriaBuilder builder = new CriteriaBuilder(OnmsMonitoringLocation.class);
+    protected CriteriaBuilder getCriteriaBuilder(UriInfo uriInfo) {
+        final CriteriaBuilder builder = new CriteriaBuilder(OnmsMonitoringLocation.class);
 
-		// Order by location name by default
-		builder.orderBy("locationName").asc();
+        // Order by location name by default
+        builder.orderBy("locationName").asc();
 
-		return builder;
-	}
+        return builder;
+    }
 
-	@Override
-	protected JaxbListWrapper<OnmsMonitoringLocation> createListWrapper(Collection<OnmsMonitoringLocation> list) {
-		return new OnmsMonitoringLocationDefinitionList(list);
-	}
+    @Override
+    protected JaxbListWrapper<OnmsMonitoringLocation> createListWrapper(Collection<OnmsMonitoringLocation> list) {
+        return new OnmsMonitoringLocationDefinitionList(list);
+    }
+
+    @Override
+    protected OnmsMonitoringLocation doGet(UriInfo uriInfo, String id) {
+        return getDao().get(id);
+    }
 }
